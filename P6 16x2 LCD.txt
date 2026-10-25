@@ -1,0 +1,25 @@
+
+from RPLCD.i2c import CharLCD
+from time import sleep
+
+# Initialize the LCD
+lcd = CharLCD('PCF8574', 0x27)  # Change 0x27 if needed
+
+# Display the message
+lcd.write_string("Hello from Pi 400!")
+
+# Wait for 3 seconds
+sleep(3)
+
+# Clear the LCD
+lcd.clear()
+
+
+_________________
+sudo raspi-config  Go to Interface Options → I2C → Enable  Reboot your Pi  Step 2: Install Required Packages  sudo apt update  sudo apt install i2c-tools python3-smbus python3-pip  pip3 install RPLCD  Check if the LCD is detected:  i2cdetect -y 1 You’ll see something like  0 1 2 3 4 5 6 7 8 9 A B C D E F  00: -- -- -- -- -- -- -- --  10: -- -- -- -- -- -- -- -- -- -- -- --  20: -- -- -- -- -- -- -- -- -- 27 -- --  Note down the address (usually 0x27 or 0x3F).
+
+
+GND - Pin 6
+VCC - 4
+SDA - 3 GPIO 2
+SCL - 5 GPIO 3
