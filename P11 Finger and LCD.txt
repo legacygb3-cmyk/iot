@@ -113,5 +113,6 @@ while True:
 ___________
 sudo apt-get update && sudo apt-get install -y i2c-tools python3-pip python3-serial
 pip3 install RPLCD adafruit-circuitpython-fingerprint smbus2
+i2cdetect -y 1
 
 
