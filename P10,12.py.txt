@@ -1,0 +1,155 @@
+enroll.py
+
+import serial
+import time
+import adafruit_fingerprint
+
+# Initialize UART serial communication
+uart = serial.Serial(
+    "/dev/serial0",
+    baudrate=57600,
+    timeout=1
+)
+
+# Initialize fingerprint sensor
+finger = adafruit_fingerprint.Adafruit_Fingerprint(uart)
+
+# Enter fingerprint ID
+finger_id = int(input("Enter fingerprint ID (1-127): "))
+
+print("Place finger on sensor...")
+
+# Capture the first fingerprint image
+while finger.get_image() != adafruit_fingerprint.OK:
+    time.sleep(0.1)
+
+print("Image captured")
+
+# Convert the first image
+if finger.image_2_tz(1) != adafruit_fingerprint.OK:
+    print("Image conversion failed")
+    exit()
+
+print("Remove finger")
+time.sleep(2)
+
+print("Place the same finger again...")
+
+# Capture the second fingerprint image
+while finger.get_image() != adafruit_fingerprint.OK:
+    time.sleep(0.1)
+
+# Convert the second image
+if finger.image_2_tz(2) != adafruit_fingerprint.OK:
+    print("Image conversion failed")
+    exit()
+
+# Create a fingerprint model
+if finger.create_model() != adafruit_fingerprint.OK:
+    print("Fingerprints did not match")
+    exit()
+
+# Store the fingerprint model
+if finger.store_model(finger_id) == adafruit_fingerprint.OK:
+    print("Fingerprint enrolled successfully")
+    print("Stored ID:", finger_id)
+else:
+    print("Failed to store fingerprint")
+
+
+
+
+dorr_lock.py
+
+import serial
+import time
+import RPi.GPIO as GPIO
+import adafruit_fingerprint
+
+GPIO.setwarnings(False)
+
+# Configure relay pin
+RELAY_PIN = 17
+
+# Active-LOW relay
+RELAY_ON = GPIO.LOW
+RELAY_OFF = GPIO.HIGH
+
+# Set GPIO mode
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(RELAY_PIN, GPIO.OUT, initial=RELAY_OFF)
+
+try:
+    # Initialize UART communication
+    uart = serial.Serial(
+        "/dev/serial0",
+        baudrate=57600,
+        timeout=1
+    )
+
+    # Initialize fingerprint sensor
+    finger = adafruit_fingerprint.Adafruit_Fingerprint(uart)
+
+    print("Fingerprint Door Lock System")
+    print("Place Finger")
+
+    while True:
+        result = finger.get_image()
+
+        if result == adafruit_fingerprint.OK:
+            print("Processing...")
+
+            # Convert image to template
+            if finger.image_2_tz(1) != adafruit_fingerprint.OK:
+                print("Fingerprint processing failed")
+                time.sleep(1)
+                continue
+
+            # Search fingerprint database
+            if finger.finger_search() == adafruit_fingerprint.OK:
+                print("Access Granted")
+
+                GPIO.output(RELAY_PIN, RELAY_ON)
+                print("Door Unlocked")
+
+                time.sleep(5)
+
+                GPIO.output(RELAY_PIN, RELAY_OFF)
+                print("Door Locked")
+
+            else:
+                print("Access Denied")
+                GPIO.output(RELAY_PIN, RELAY_OFF)
+
+            time.sleep(1)
+            print("Place Finger")
+
+        else:
+            # No finger detected
+            time.sleep(0.1)
+
+except KeyboardInterrupt:
+    print("\nProgram stopped")
+
+finally:
+    # Ensure relay is OFF and clean up GPIO
+    GPIO.output(RELAY_PIN, RELAY_OFF)
+    GPIO.cleanup()
+
+
+
+_____________________________________
+Relay Module
+
+VCC - 4
+GND - 9
+RELAY in - 11
+
+R307/R305
+
+VCC - 2
+GND - 6
+TX - 8
+RX - 10
+
+Step 1: Update Raspberry Pi packages  sudo apt update sudo apt upgrade –y Step 2: Install Python and serial support sudo apt install -y python3 python3-pip python3-serial Step 3: Install fingerprint library pip3 install adafruit-circuitpython-fingerprint Step 4: Enable Raspberry Pi UART  sudo raspi config Go to Interface Options ------Serial Port Login shell over serial: No  Serial port hardware: Yes  sudo reboot After reboot, check the serial device: ls  -l  /dev/serial0 

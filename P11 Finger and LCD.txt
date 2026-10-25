@@ -1,0 +1,117 @@
+enroll.py
+
+import time
+import serial
+import adafruit_fingerprint
+
+# Initialize UART communication
+uart = serial.Serial(
+    "/dev/serial0",
+    baudrate=57600,
+    timeout=1
+)
+
+# Initialize fingerprint sensor
+finger = adafruit_fingerprint.Adafruit_Fingerprint(uart)
+
+# Enter slot ID
+location = int(input("Enter Slot ID (1-127): "))
+
+print("Place finger on sensor...")
+
+# Capture first fingerprint
+while finger.get_image() != adafruit_fingerprint.OK:
+    pass
+
+finger.image_2_tz(1)
+
+print("Remove finger...")
+time.sleep(2)
+
+# Wait until finger is removed
+while finger.get_image() == adafruit_fingerprint.OK:
+    pass
+
+print("Place SAME finger again...")
+
+# Capture second fingerprint
+while finger.get_image() != adafruit_fingerprint.OK:
+    pass
+
+finger.image_2_tz(2)
+
+# Create model and save fingerprint
+if finger.create_model() == adafruit_fingerprint.OK:
+    if finger.store_model(location) == adafruit_fingerprint.OK:
+        print(f"Enrolled successfully at Slot {location}!")
+    else:
+        print("Error saving template.")
+else:
+    print("Fingerprint mismatch. Try again.")
+
+
+
+main_verify.py
+
+
+import time
+import serial
+from RPLCD.i2c import CharLCD
+import adafruit_fingerprint
+
+# Initialize LCD
+lcd = CharLCD('PCF8574', 0x27, cols=16, rows=2)
+
+# Initialize fingerprint sensor
+uart = serial.Serial(
+    "/dev/serial0",
+    baudrate=57600,
+    timeout=1
+)
+
+finger = adafruit_fingerprint.Adafruit_Fingerprint(uart)
+
+
+# Function to display messages on LCD
+def show(l1, l2=""):
+    lcd.clear()
+    lcd.cursor_pos = (0, 0)
+    lcd.write_string(l1)
+    lcd.cursor_pos = (1, 0)
+    lcd.write_string(l2)
+
+
+# Initial message
+show("System Ready", "Place Finger")
+
+while True:
+    if finger.get_image() == adafruit_fingerprint.OK:
+        show("Processing...", "Please Wait")
+
+        # Convert fingerprint image
+        if finger.image_2_tz(1) == adafruit_fingerprint.OK:
+
+            # Search fingerprint database
+            if finger.finger_search() == adafruit_fingerprint.OK:
+                show("Fingerprint Match", f"ID: {finger.finger_id}")
+                time.sleep(3)
+
+            else:
+                show("Fingerprint", "Unmatched")
+                time.sleep(1.5)
+
+                show("Access Denied", "")
+                time.sleep(2)
+
+        show("Place Finger", "")
+
+    time.sleep(0.1)
+
+
+
+
+___________
+sudo apt-get update && sudo apt-get install -y i2c-tools python3-pip python3-serial
+pip3 install RPLCD adafruit-circuitpython-fingerprint smbus2
+
+

@@ -1,0 +1,14 @@
+# Install Node-RED
+bash <(curl -sL https://github.com/node-red/linuxinstallers/releases/latest/download/install-update-nodered-deb)
+
+# Start Node-RED
+node-red-start
+
+# Stop Node-RED
+node-red-stop
+
+# Restart Node-RED
+node-red-restart
+
+# Reload Node-RED
+node-red-reload
