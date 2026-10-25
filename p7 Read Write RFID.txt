@@ -1,0 +1,44 @@
+RC522 module pins	Raspberry Pi pins	Raspberry Pi board/physical pins
+3.3V	                      3.3V	                 1
+Gnd	                       Gnd	                 6 (can connect with any other ground pin)
+SDA	                      SPI0 CS0	                 24
+SCK	                      SPI0 SCLK	                 23
+MOSI	                      SPI0 MOSI	                 19
+MISO	                      SPI0 MISO	                 21
+
+_________________________________________________________________________________
+
+sudo apt-get update
+sudo apt-get upgrade
+sudo raspi-config
+lsmod | grep spi
+sudo apt-get install python3-dev python3-pip
+sudo pip3 install spidev
+sudo pip3 install mfrc522
+
+code:- 
+TO Write Data
+
+import RPi.GPIO as GPIO
+from mfrc522 import SimpleMFRC522
+
+r = SimpleMFRC522()
+
+while True:
+    text = input('Enter new data : ')
+    print('Place the tag')
+    r.write(text)
+    print('Data written')
+
+To read Data
+
+import RPi.GPIO as GPIO
+from mfrc522 import SimpleMFRC522
+
+r = SimpleMFRC522()
+
+while True:
+    print('Place the tag')
+    id, text = r.read()
+    print('ID =', id)
+    print('Data =', text)
