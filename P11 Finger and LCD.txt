@@ -1,3 +1,13 @@
+Module Pin	Pin Function	Raspberry Pi Pin Name	Physical Pin No.
+16×2 I2C LCD (HW-61 Backpack)	GND	Ground reference	GND	Pin 6
+16×2 I2C LCD (HW-61 Backpack)	VCC	Supply voltage (+5V)	5V Power	Pin 2
+16×2 I2C LCD (HW-61 Backpack)	SDA	I2C serial data	GPIO 2 (I2C1 SDA)	Pin 3
+16×2 I2C LCD (HW-61 Backpack)	SCL	I2C serial clock	GPIO 3 (I2C1 SCL)	Pin 5
+R307/R305 Fingerprint Sensor	Red (VCC)	Module power (+5V)	5V Power	Pin 4
+R307/R305 Fingerprint Sensor	Black (GND)	Ground reference	GND	Pin 9 / 14
+R307/R305 Fingerprint Sensor	Yellow/Green (TXD)	UART transmit data	GPIO 15 (UART0 RXD)	Pin 10
+R307/R305 Fingerprint Sensor	White/Blue (RXD)	UART receive data	GPIO 14 (UART0 TXD)	Pin 8
+
 enroll.py
 
 import time
