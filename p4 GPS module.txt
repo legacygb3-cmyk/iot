@@ -1,0 +1,19 @@
+TXD- pin 10
+RXD- pin 8 
+VCC- pin 1 
+GND - pin 6/9
+_____________________
+
+import time
+import RPi.GPIO as GPIO
+import pio
+import Ports
+
+GPIO.setmode(GPIO.BOARD)
+GPIO.setwarnings(False)
+
+pio.uart = Ports.UART()
+
+while 1:
+    data = pio.uart.recv()
+    pio.uart.print(data)
