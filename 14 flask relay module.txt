@@ -1,0 +1,84 @@
+from flask import Flask, render_template_string
+import RPi.GPIO as GPIO
+
+app = Flask(__name__)
+RELAY = 17
+
+# GPIO setup
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(RELAY, GPIO.OUT)
+GPIO.output(RELAY, GPIO.HIGH)
+
+# HTML page
+HTML = """
+<!DOCTYPE html>
+<html>
+<head>
+<title>Relay Control</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {
+    font-family: Arial;
+    text-align: center;
+    margin-top: 70px;
+}
+.status {
+    font-size: 28px;
+    font-weight: bold;
+}
+button {
+    font-size: 25px;
+    padding: 20px 40px;
+    margin: 15px;
+    color: white;
+    border: none;
+    border-radius: 8px;
+}
+.on {
+    background: green;
+}
+.off {
+    background: red;
+}
+</style>
+</head>
+<body>
+<h1>Raspberry Pi Relay</h1>
+{% if state %}
+<div class="status" style="color:green;">
+Status: ON
+</div>
+{% else %}
+<div class="status" style="color:red;">
+Status: OFF
+</div>
+{% endif %}
+<a href="/on">
+<button class="on">ON</button>
+</a>
+<a href="/off">
+<button class="off">OFF</button>
+</a>
+</body>
+</html>
+"""
+
+@app.route("/")
+def home():
+    state = GPIO.input(RELAY) == GPIO.LOW
+    return render_template_string(HTML, state=state)
+
+@app.route("/on")
+def turn_on():
+    GPIO.output(RELAY, GPIO.LOW)
+    return render_template_string(HTML, state=True)
+
+@app.route("/off")
+def turn_off():
+    GPIO.output(RELAY, GPIO.HIGH)
+    return render_template_string(HTML, state=False)
+
+try:
+    app.run(host="0.0.0.0", port=5000)
+finally:
+    GPIO.cleanup()
