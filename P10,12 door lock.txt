@@ -152,4 +152,10 @@ GND - 6
 TX - 8
 RX - 10
 
-Step 1: Update Raspberry Pi packages  sudo apt update sudo apt upgrade –y Step 2: Install Python and serial support sudo apt install -y python3 python3-pip python3-serial Step 3: Install fingerprint library pip3 install adafruit-circuitpython-fingerprint Step 4: Enable Raspberry Pi UART  sudo raspi config Go to Interface Options ------Serial Port Login shell over serial: No  Serial port hardware: Yes  sudo reboot After reboot, check the serial device: ls  -l  /dev/serial0 
+Step 1: Update Raspberry Pi packages  sudo apt update sudo apt upgrade –y 
+Step 2: Install Python and serial support sudo apt install -y python3 python3-pip python3-serial 
+Step 3: Install fingerprint library pip3 install adafruit-circuitpython-fingerprint 
+Step 4: Enable Raspberry Pi UART  sudo raspi config Go to Interface Options ------
+Serial Port Login shell over serial: No 
+Serial port hardware: Yes 
+sudo reboot After reboot, check the serial device: ls  -l  /dev/serial0 
